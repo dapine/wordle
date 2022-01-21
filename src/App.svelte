@@ -4,7 +4,11 @@
   import { checkMatches } from "./lib/character/character";
   import { Cell, emptyRow, makeCellGrid } from "./lib/game/gameLogic";
 
-  let wordle = "teste";
+  import * as wordleList from "./lib/game/wordleList.json";
+  import { randInt } from "./lib/rand/random";
+
+  const wordle = wordleList.wordles[randInt(0, wordleList.wordles.length)];
+  console.log(wordle);
   export let guess = "";
   export let cellGrid = makeCellGrid();
 
