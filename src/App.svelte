@@ -1,5 +1,6 @@
 <script lang="ts">
   import CharacterBox from "./components/CharacterBox.svelte";
+  import VirtualKeyboard from "./components/VirtualKeyboard.svelte";
 
   import { checkMatches } from "./lib/character/character";
   import { Cell, emptyRow, makeCellGrid } from "./lib/game/gameLogic";
@@ -9,12 +10,15 @@
 
   const wordle = wordleList.wordles[randInt(0, wordleList.wordles.length)];
   console.log(wordle);
-  export let guess = "";
-  export let cellGrid = makeCellGrid();
 
-  function changeGuess(e: any) {
-    guess = e.target.value;
-  }
+	function bufToString(buf) {
+		return buf.join('').toLowerCase();
+	}
+
+  let cellGrid = makeCellGrid();
+	let buffer: Array<string> = [];
+	$: guess = bufToString(buffer);
+	$: console.log(guess)
 
   function applyGuess() {
     for (let i = 0; i < cellGrid.length; i++) {
@@ -47,13 +51,7 @@
     {/each}
   </div>
 
-  <input
-    type="text"
-    placeholder="Guess"
-    value={guess}
-    on:change={changeGuess}
-  />
-  <button on:click={(_) => applyGuess()}>Guess</button>
+	<VirtualKeyboard bind:buffer={buffer} returnAction={applyGuess} />
 </main>
 
 <style>
