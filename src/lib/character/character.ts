@@ -50,7 +50,7 @@ export interface CharacterMatchPositions {
 // Not match: character not in wordle
 // Partital match: character in wordle but not on position
 // Full match: character in wordle an in position
-export type Match = "NotMatch" | "PartialMatch" | "FullMatch"
+export type Match = "NotMatch" | "PartialMatch" | "FullMatch" | "Empty"
 
 function diacriticToPlainLatin(
   character: LatinCharacterWithDiacritics

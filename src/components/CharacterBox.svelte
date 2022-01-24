@@ -1,17 +1,18 @@
 <script lang="ts">
   import type { Character, Match } from "../lib/character/character";
 
-  export let character: Character;
+  export let character: Character | '';
   export let match: Match
 
   export const colorCSSClassMap: Record<Match, string> = {
     FullMatch: 'fullMatch',
     PartialMatch: 'partialMatch',
-    NotMatch: 'notMatch'
+    NotMatch: 'notMatch',
+    Empty: 'empty'
   }
 </script>
 
-<div class={colorCSSClassMap[match]}>{character || ""}</div>
+<div class={colorCSSClassMap[match]}>{character}</div>
 
 <style>
   :root {
@@ -40,5 +41,9 @@
 
   .notMatch {
     background-color: #ef476f;
+  }
+
+  .empty {
+    color: black;
   }
 </style>
