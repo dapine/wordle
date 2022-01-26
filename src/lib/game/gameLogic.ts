@@ -7,6 +7,11 @@ export interface Cell {
   match: Match;
 }
 
+export interface Key {
+	key: string;
+	match: Match;
+}
+
 export function makeCellGrid(): Array<Array<Cell>> {
   return [
     [{ character: '', match: 'Empty' } as Cell, { character: '', match: 'Empty' } as Cell, { character: '', match: 'Empty' } as Cell, { character: '', match: 'Empty' } as Cell, { character: '', match: 'Empty' } as Cell],

@@ -3,7 +3,7 @@
   import VirtualKeyboard from "./components/VirtualKeyboard.svelte";
 
   import { checkMatches, Character } from "./lib/character/character";
-  import { Cell, countNonEmpty, makeCellGrid, GameState } from "./lib/game/gameLogic";
+  import { Cell, countNonEmpty, makeCellGrid, GameState, Key } from "./lib/game/gameLogic";
 
   import * as wordleList from "./lib/game/wordleList.json";
   import { randInt } from "./lib/rand/random";
@@ -43,6 +43,7 @@
   let buffer: Array<string> = [];
   let currentRow: number = 0;
 	let gameState: GameState = "Playing";
+	let usedCharacters: Array<Key> = [];
 
   $: guess = bufToString(buffer);
   $: cellGrid = updateGrid(cellGrid, buffer, currentRow);
@@ -51,6 +52,25 @@
 		const matches = checkMatches(guess, wordle).slice(0, 5);
 		const cells: Array<Cell> = matches.map((m, i) => {
 			return { character: buffer[i] as Character, match: m } as Cell;
+		});
+
+		matches.forEach((m, i) => {
+			const key = buffer[i];
+			if (usedCharacters.filter(uc => uc.key === key) < 1) {
+				usedCharacters = [...usedCharacters, {key: key, match: m} as Key];
+			} else {
+				const i = usedCharacters.findIndex(uc => uc.key === key);
+				const isFullMatch = usedCharacters[i].match === "FullMatch";
+				const isPartialToNotMatch = usedCharacters[i].match === "PartialMatch" && m === "NotMatch";
+
+				if (!isFullMatch && !isPartialToNotMatch) {
+					usedCharacters = [
+						...usedCharacters.slice(0, i),
+						{key: key, match: m} as Key,
+						...usedCharacters.slice(i + 1),
+					];
+				}
+			}
 		});
 
     if (currentRow < 5 && countNonEmpty(cellGrid[currentRow]) === 5) {
@@ -99,7 +119,7 @@
     {/each}
   </div>
 
-  <VirtualKeyboard bind:buffer returnAction={() => applyGuess()} />
+  <VirtualKeyboard bind:buffer returnAction={() => applyGuess()} usedCharacters={usedCharacters} />
 </main>
 
 <style>
