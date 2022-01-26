@@ -1,5 +1,7 @@
 import type { Character, Match } from "../character/character";
 
+export type GameState = "Playing" | "Win" | "Lose"
+
 export interface Cell {
   character: Character | '';
   match: Match;

@@ -3,7 +3,7 @@
   import VirtualKeyboard from "./components/VirtualKeyboard.svelte";
 
   import { checkMatches, Character } from "./lib/character/character";
-  import { Cell, countNonEmpty, makeCellGrid } from "./lib/game/gameLogic";
+  import { Cell, countNonEmpty, makeCellGrid, GameState } from "./lib/game/gameLogic";
 
   import * as wordleList from "./lib/game/wordleList.json";
   import { randInt } from "./lib/rand/random";
@@ -20,7 +20,7 @@
     buffer: Array<string>,
     currentRow: number
   ): Array<Array<Cell>> {
-    if (buffer.length <= 5) {
+    if (buffer.length <= 5 && gameState === "Playing") {
       const emptyRow = [
         { character: "", match: "Empty" } as Cell,
         { character: "", match: "Empty" } as Cell,
@@ -42,17 +42,18 @@
   let cellGrid = makeCellGrid();
   let buffer: Array<string> = [];
   let currentRow: number = 0;
+	let gameState: GameState = "Playing";
 
   $: guess = bufToString(buffer);
   $: cellGrid = updateGrid(cellGrid, buffer, currentRow);
 
   function applyGuess() {
-    if (currentRow < 5 && countNonEmpty(cellGrid[currentRow]) === 5) {
-      const matches = checkMatches(guess, wordle).slice(0, 5);
-      const cells: Array<Cell> = matches.map((m, i) => {
-        return { character: buffer[i] as Character, match: m } as Cell;
-      });
+		const matches = checkMatches(guess, wordle).slice(0, 5);
+		const cells: Array<Cell> = matches.map((m, i) => {
+			return { character: buffer[i] as Character, match: m } as Cell;
+		});
 
+    if (currentRow < 5 && countNonEmpty(cellGrid[currentRow]) === 5) {
       cellGrid = [
         ...cellGrid.slice(0, currentRow),
         cells,
@@ -61,13 +62,33 @@
 
       currentRow = currentRow + 1;
       buffer = [];
-    } else {
+
+			if (matches.every(m => m === "FullMatch")) {
+				gameState = "Win";
+			}
+    } else if (currentRow === 5) {
       // last try
+      cellGrid = [
+        ...cellGrid.slice(0, currentRow),
+        cells,
+        ...cellGrid.slice(currentRow + 1),
+      ];
+
+      buffer = [];
+			currentRow = currentRow + 1;
+
+			gameState = matches.every(m => m === "FullMatch") ? "Win" : "Lose";
     }
   }
 </script>
 
 <main>
+	{#if gameState === "Win"}
+		<h1>Nice!</h1>
+	{/if}
+	{#if gameState === "Lose"}
+		<h1>Oh no!</h1>
+	{/if}
   <div class="container">
     {#each cellGrid as row}
       <div class="row">
