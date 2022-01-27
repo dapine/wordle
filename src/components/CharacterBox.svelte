@@ -16,8 +16,8 @@
 
 <style>
   :root {
-    --width: 5rem;
-    --height: 5rem;
+    --width: 4rem;
+    --height: 4rem;
   }
 
   div {
@@ -26,7 +26,7 @@
     width: var(--width);
     height: var(--height);
     text-align: center;
-    font-size: 30pt;
+    font-size: 24pt;
     line-height: var(--height);
     color: white;
   }

@@ -27,6 +27,9 @@
 <style>
   button {
     font-size: 14pt;
+		border-radius: 10px;
+		min-width: 3rem;
+		min-height: 3rem;
   }
 	/* XXX: this is also used in `CharacterBox` component */
 	/* make one unique style instance visible to both components */

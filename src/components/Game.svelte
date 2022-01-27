@@ -109,17 +109,21 @@
 	{#if gameState === "Lose"}
 		<h1>Oh no!</h1>
 	{/if}
-  <div class="container">
-    {#each cellGrid as row}
-      <div class="row">
-        {#each row as cell}
-          <CharacterBox character={cell.character} match={cell.match} />
-        {/each}
-      </div>
-    {/each}
-  </div>
+	<div class="grid">
+		<div class="container">
+			{#each cellGrid as row}
+				<div class="row">
+					{#each row as cell}
+						<CharacterBox character={cell.character} match={cell.match} />
+					{/each}
+				</div>
+			{/each}
+		</div>
+	</div>
 
-  <VirtualKeyboard bind:buffer returnAction={() => applyGuess()} usedCharacters={usedCharacters} />
+	<div class="container" id="vk">
+		<VirtualKeyboard bind:buffer returnAction={() => applyGuess()} usedCharacters={usedCharacters} />
+	</div>
 </div>
 
 <style>
@@ -132,5 +136,9 @@
     display: flex;
     flex-direction: column;
     gap: 4px;
+		align-items: center;
   }
+	#vk {
+		margin-top: 20px;
+	}
 </style>
