@@ -107,9 +107,17 @@ export function makeCharacterMatchPositions(
 export function checkMatches(guess: string, wordle: string): Array<Match> {
   // XXX: will "guess" chars always be a plain LatinCharacter?
   // should i remove potential diacritics as i do in charsPositionsInWordle?
-  const matchesPos = guess
-    .split("")
-    .map((c: Character) => makeCharacterMatchPositions(c, wordle));
+	let matchesPos = [];
+	guess.split("").forEach((c: Character, i: number) => {
+		const charPos = makeCharacterMatchPositions(c, wordle);
+		const charExistsInMatchesPos = matchesPos.some(mp => mp.character === charPos.character);
+
+		if (charExistsInMatchesPos && !charPos.positions.some(p => p === i)) {
+			matchesPos = [...matchesPos, { character: c, positions: [] }];
+		} else {
+			matchesPos = [...matchesPos, charPos];
+		}
+	});
 
   const matches = matchesPos.map((cm, i) =>
     cm.positions.some((p) => p === i)
