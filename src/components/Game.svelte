@@ -2,8 +2,8 @@
   import CharacterBox from "./CharacterBox.svelte";
   import VirtualKeyboard from "./VirtualKeyboard.svelte";
 
-  import { checkMatches, Character } from "../lib/character/character";
-  import { Cell, countNonEmpty, makeCellGrid, GameState, Key } from "../lib/game/gameLogic";
+  import { checkMatches } from "../lib/character/character";
+  import { countNonEmpty, makeCellGrid, updateGrid, matchesToCells, GameState, Key, updateKeyboard } from "../lib/game/gameLogic";
 
   import * as wordleList from "../lib/game/wordleList.json";
   import { randInt } from "../lib/rand/random";
@@ -15,30 +15,6 @@
     return buf.join("").toLowerCase();
   }
 
-  function updateGrid(
-    cellGrid: Array<Array<Cell>>,
-    buffer: Array<string>,
-    currentRow: number
-  ): Array<Array<Cell>> {
-    if (buffer.length <= 5 && gameState === "Playing") {
-      const emptyRow = [
-        { character: "", match: "Empty" } as Cell,
-        { character: "", match: "Empty" } as Cell,
-        { character: "", match: "Empty" } as Cell,
-        { character: "", match: "Empty" } as Cell,
-        { character: "", match: "Empty" } as Cell,
-      ];
-      const cells = buffer.map((b) => {
-        return { character: b, match: "Empty" } as Cell;
-      });
-
-      const newRow = cells.concat(emptyRow).slice(0, 5);
-      cellGrid[currentRow] = newRow;
-    }
-
-    return cellGrid;
-  }
-
   let cellGrid = makeCellGrid();
   let buffer: Array<string> = [];
   let currentRow: number = 0;
@@ -46,32 +22,13 @@
 	let usedCharacters: Array<Key> = [];
 
   $: guess = bufToString(buffer);
-  $: cellGrid = updateGrid(cellGrid, buffer, currentRow);
+  $: cellGrid = updateGrid(cellGrid, buffer, currentRow, gameState);
 
   function applyGuess() {
 		const matches = checkMatches(guess, wordle).slice(0, 5);
-		const cells: Array<Cell> = matches.map((m, i) => {
-			return { character: buffer[i] as Character, match: m } as Cell;
-		});
+		const cells = matchesToCells(matches, buffer);
 
-		matches.forEach((m, i) => {
-			const key = buffer[i];
-			if (usedCharacters.filter(uc => uc.key === key) < 1) {
-				usedCharacters = [...usedCharacters, {key: key, match: m} as Key];
-			} else {
-				const i = usedCharacters.findIndex(uc => uc.key === key);
-				const isFullMatch = usedCharacters[i].match === "FullMatch";
-				const isPartialToNotMatch = usedCharacters[i].match === "PartialMatch" && m === "NotMatch";
-
-				if (!isFullMatch && !isPartialToNotMatch) {
-					usedCharacters = [
-						...usedCharacters.slice(0, i),
-						{key: key, match: m} as Key,
-						...usedCharacters.slice(i + 1),
-					];
-				}
-			}
-		});
+		usedCharacters = updateKeyboard(usedCharacters, matches, buffer);
 
     if (currentRow < 5 && countNonEmpty(cellGrid[currentRow]) === 5) {
       cellGrid = [
