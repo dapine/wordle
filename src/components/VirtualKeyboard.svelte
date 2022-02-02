@@ -1,9 +1,22 @@
 <script lang="ts">
-	import Key from "./Key.svelte";
+	import KeyComponent from "./Key.svelte";
+	import type { Key } from "../lib/game/gameLogic";
+	import type { Match } from "../lib/character/character";
 
 	export let buffer: Array<string>;
-	export let returnAction;
-	export let usedCharacters;
+	export let returnAction: () => void;
+	export let usedCharacters: Array<Key>;
+
+	interface KeyMatch {
+		value: string
+		match: Match
+		action?: () => void
+	}
+
+	interface KeyRow {
+		classes: string
+		keys: Array<KeyMatch>
+	}
 
 	const mapKeyRow: Record<string, number> = {
 		"Q": 0,	
@@ -36,7 +49,7 @@
 		"M": 2
 	};
 
-	let keyRows = [
+	let keyRows: Array<KeyRow> = [
 		{
 			classes: "",
 			keys: [
@@ -50,7 +63,7 @@
 				{ value: "I", match: "Empty" },
 				{ value: "O", match: "Empty" },
 				{ value: "P", match: "Empty" },
-				{ value: "⌫" },
+				{ value: "⌫", match: "Empty" },
 			]
 		},
 		{ 
@@ -65,7 +78,7 @@
 				{ value: "J", match: "Empty" },
 				{ value: "K", match: "Empty" },
 				{ value: "L", match: "Empty" },
-				{ value: "⏎", action: returnAction }
+				{ value: "⏎", match: "Empty", action: returnAction }
 			]
 		},
 		{
@@ -82,8 +95,8 @@
 		}
 	];
 
-	function updateKeys(keyRows, usedCharacters) {
-		usedCharacters.forEach(uc => {
+	function updateKeys(keyRows: Array<KeyRow>, usedCharacters: Array<Key>) {
+		usedCharacters.forEach((uc: Key) => {
 			const rowIndex = mapKeyRow[uc.key];
 			const keyIndex = keyRows[rowIndex].keys.findIndex(k => k.value === uc.key);
 
@@ -103,7 +116,7 @@
 	{#each keyRows as keyRow }
 		<div class={`key-row ${keyRow.classes}`}>
 			{#each keyRow.keys as key}
-				<Key value={key.value} match={key.match} bind:buffer={buffer} action={key.action} />
+				<KeyComponent value={key.value} match={key.match} bind:buffer={buffer} action={key.action} />
 			{/each}
 		</div>
 	{/each}

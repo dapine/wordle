@@ -120,7 +120,7 @@ export function checkMatches(guess: string, wordle: string): Array<Match> {
 	});
 
   const matches = matchesPos.map((cm, i) =>
-    cm.positions.some((p) => p === i)
+    cm.positions.some((p: number) => p === i)
       ? "FullMatch" : cm.positions.length > 0
         ? "PartialMatch" : "NotMatch");
 

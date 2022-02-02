@@ -1,4 +1,6 @@
 <script lang="ts">
+	import type { Match } from "../lib/character/character";
+
 	export let value: string;
 	export let buffer: Array<string> = [];
 	export let action = undefined;
